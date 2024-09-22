@@ -1,0 +1,54 @@
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+from fastapi import Request
+import db_helper
+import generic_helper
+
+inprogress_order = {}
+
+app = FastAPI()
+
+@app.post("/")
+async def handle_request(request: Request):
+    payload = await request.json()
+    
+    intent = payload['queryResult']['intent']['displayName']
+    parameters = payload['queryResult']['parameters']
+    output_contexts = payload['queryResult']['outputContexts']
+    
+    session_id = generic_helper.extract_session_id(output_contexts[0]['name'])
+    
+    intent_handler_dict = {
+        "track.order - context ongoing-tracking": track_order,
+        "order.add - context: ongoing-order": add_to_order,
+        # "order.complete - context: ongoing-order",
+        # "order.remove - context: ongoing"
+    }
+    return intent_handler_dict[intent](parameters, session_id)
+
+def add_to_order(parameters: dict, session_id: dict):
+    food_quantity = parameters["number"]
+    food_item = parameters["food-item"]
+    
+    if len(food_item) != len(food_quantity):
+        fulfilment_text = "Sorry I did'nt understand. Can you please specify food items and quantities."
+    else:
+        new_food_dict = dict(zip(food_item, food_quantity))
+        if session_id in inprogress_order:
+            current_food_dict = inprogress_order[session_id]
+            current_food_dict.update(new_food_dict)
+        else:
+            inprogress_order[session_id] = new_food_dict
+        fulfilment_text = f"Recieved {food_item} and {food_quantity} in the backend"
+    
+    return JSONResponse(content={
+        'fulfillmentText': fulfilment_text
+        }) 
+
+
+
+def track_order(parameters: dict):
+    order_id = int(parameters['number'])
+    
+    order_status = db_helper.get_order_status(order_id)
+    

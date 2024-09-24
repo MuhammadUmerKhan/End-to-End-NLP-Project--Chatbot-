@@ -50,12 +50,12 @@ def start_new_order(parameters: dict, session_id: str):
     inprogress_order[session_id] = {}
 
     # Respond with confirmation message
-    fulfillment_text = ("Ok, starting a new order. You can say things like "
-                        "'I want two pizzas and one mango lassi'. "
+    fulfillment_text = ("Ok, starting a new order. You can say things like: \n"
+                        "'I want two pizzas and one mango lassi'. \n"
                         "Make sure to specify a quantity for every food item! "
-                        "Also, we have only the following items on our menu: "
-                        "Pav Bhaji, Chole Bhature, Pizza, Mango Lassi, Masala Dosa, "
-                        "Biryani, Vada Pav, Rava Dosa, and Samosa.")
+                        "Also, we have only the following items on our menu: \n"
+                        "1. Pav Bhaji \n 2. Chole Bhature \n 3. Pizza \n, 4. Mango Lassi \n, 5. Masala Dosa\n, "
+                        "6. Biryani \n, 7. Vada Pav \n, 8. Rava Dosa, and Samosa.")
     
     return JSONResponse(content={"fulfillmentText": fulfillment_text})
 
@@ -96,7 +96,7 @@ def complete_order(parameters: dict, session_id: str):
         else:
             order_total = db_helper.get_total_order_price(order_id)
             fulfillment_text = (f"Thank you for ordering. We have placed your order. Here is your order id # {order_id}. "
-                                f"Your order total is {int(order_total)}$, which you can pay at the time of delivery! Enjoy!")
+                                f"Your order total is {int(order_total)}$, which you can pay at the time of delivery! \n Enjoy!")
         del inprogress_order[session_id]  # Clear the order after completion
         
     return JSONResponse(content={'fulfillmentText': fulfillment_text})

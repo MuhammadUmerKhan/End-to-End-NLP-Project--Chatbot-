@@ -17,7 +17,7 @@ def insert_order_item(food_item, quantity, next_order_id):
         
         cursor.close()
         
-        print("Order item inserted sucessfully!")
+        # print("Order item inserted sucessfully!")
         
         return 1
     except mysql.connector.Error as err:
@@ -72,17 +72,44 @@ def get_next_order_id():
         return result + 1
     
 
+# def get_order_status(order_id):
+#     cursor = cnx.cursor()
+
+#     query = f"SELECT status FROM order_tracking WHERE order_id = {order_id}"
+#     query_price = f"SELECT get_total_order_price({order_id})"
+#     cursor.execute(query, query_price)
+
+#     result = cursor.fetchone()
+
+#     cursor.close()
+    
+#     if result:
+#         return result[0]
+#     else:
+#         return None
+    
 def get_order_status(order_id):
     cursor = cnx.cursor()
 
-    query = f"SELECT status FROM order_tracking WHERE order_id = {order_id}"
-    cursor.execute(query)
+    # Combined query for status and total price
+    query = f"""
+    SELECT 
+        ot.status, 
+        get_total_order_price(ot.order_id) AS total_price 
+    FROM 
+        order_tracking ot 
+    WHERE 
+        ot.order_id = {order_id};
+    """
 
+    cursor.execute(query)
     result = cursor.fetchone()
 
     cursor.close()
     
     if result:
-        return result[0]
+        # Returning both status and total price
+        status, total_price = result
+        return status, total_price      
     else:
         return None

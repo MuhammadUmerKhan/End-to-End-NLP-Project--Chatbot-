@@ -50,12 +50,21 @@ def start_new_order(parameters: dict, session_id: str):
     inprogress_order[session_id] = {}
 
     # Respond with confirmation message
-    fulfillment_text = ("Ok, starting a new order. You can say things like: \n"
-                        "'I want two pizzas and one mango lassi'. \n"
-                        "Make sure to specify a quantity for every food item! "
-                        "Also, we have only the following items on our menu: \n"
-                        "1. Pav Bhaji \n 2. Chole Bhature \n 3. Pizza \n, 4. Mango Lassi \n, 5. Masala Dosa\n, "
-                        "6. Biryani \n, 7. Vada Pav \n, 8. Rava Dosa, and Samosa.")
+    fulfillment_text = """Ok, starting a new order. You can say things like:
+                        'I want two pizzas and one mango lassi'.
+                        Make sure to specify a quantity for every food item!
+
+                        Also, we have only the following items on our menu:
+                        Pav Bhaji,
+                        Chole Bhature,
+                        Pizza,
+                        Mango Lassi,
+                        Masala Dosa,
+                        Biryani,
+                        Vada Pav,
+                        Rava Dosa,
+                        Samosa,
+                        """
     
     return JSONResponse(content={"fulfillmentText": fulfillment_text})
 
